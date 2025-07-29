@@ -1,0 +1,9 @@
+pandas
+numpy
+sklearn.ensemble
+matplotlib.pyplot
+seaborn
+folium
+folium.plugins
+plotly.express
+os
