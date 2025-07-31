@@ -1,8 +1,10 @@
 pandas
 numpy
 scikit-learn
-matplotlip
+matplotlib
 seaborn
 folium
 plotly
 pandas
+flask
+werkzeug

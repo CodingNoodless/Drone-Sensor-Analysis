@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Plume Visualizer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      z-index: 1000;
+      flex-direction: column;
+    }
+    /* Spinner styling */
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #plot { width: 100%; height: 600px; border: 1px solid #ddd; margin-top: 1rem; }
+    #controls { margin-top: 1rem; display: none; }
+    label { margin-right: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Upload Sensor & GPS Data</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="csvs" accept=".csv" multiple required />
+    <button type="submit">Upload & Generate</button>
+  </form>
+
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <div>Loading…</div>
+  </div>
+
+  <div id="controls">
+    <label for="pollutantSelect">Choose pollutant:</label>
+    <select id="pollutantSelect"></select>
+  </div>
+
+  <div id="plot"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const loader = document.getElementById('loader');
+    const controls = document.getElementById('controls');
+    const select = document.getElementById('pollutantSelect');
+    const plotDiv = document.getElementById('plot');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loader.style.visibility = 'visible';
+      controls.style.display = 'none';
+      plotDiv.innerHTML = '';
+
+      const formData = new FormData(form);
+      const response = await fetch('/upload', { method: 'POST', body: formData });
+      if (!response.ok) {
+        loader.innerHTML = '<div style="color:red;">Error processing files.</div>';
+        return;
+      }
+
+      const { pollutants, urls } = await response.json();
+
+      select.innerHTML = '';
+      pollutants.forEach(p => {
+        const option = document.createElement('option');
+        option.value = urls[p];
+        option.textContent = p;
+        select.appendChild(option);
+      });
+
+      select.onchange = () => {
+        loader.style.visibility = 'visible';
+        plotDiv.innerHTML = `<iframe src="${select.value}?t=${Date.now()}" width="100%" height="600"></iframe>`;
+        const iframe = plotDiv.querySelector('iframe');
+        iframe.onload = () => {
+          loader.style.visibility = 'hidden';
+        };
+      };
+
+      controls.style.display = 'block';
+      select.selectedIndex = 0;
+      select.onchange();
+    });
+  </script>
+  <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+</body>
+</html>
