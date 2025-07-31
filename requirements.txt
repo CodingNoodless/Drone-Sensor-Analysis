@@ -1,9 +1,8 @@
 pandas
 numpy
-sklearn.ensemble
-matplotlib.pyplot
+scikit-learn
+matplotlip
 seaborn
 folium
-folium.plugins
-plotly.express
-os
+plotly
+pandas
