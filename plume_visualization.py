@@ -25,7 +25,7 @@ def main(input_csv="analysis_output/merged_refined_data.csv", out_dir="final_plu
     alt_lin = np.linspace(df.altitude.min(), df.altitude.max(), nz)
     grid_lon, grid_lat, grid_alt = np.meshgrid(lon_lin, lat_lin, alt_lin, indexing="ij")
 
-    for pollutant in ["CO_refined", "CH4_refined", "NOx_refined", "LPG_refined"]:
+    for pollutant in ["co_refined", "ch4_refined", "nox_refined", "lpg_refined"]:
         pts = df[["longitude", "latitude", "altitude"]].values
         vals = df[pollutant].values
         vol_lin = griddata(pts, vals, (grid_lon, grid_lat, grid_alt), method="linear")
